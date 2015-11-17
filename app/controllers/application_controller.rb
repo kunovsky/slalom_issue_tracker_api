@@ -2,9 +2,9 @@ class ApplicationController < ActionController::API
    private
    def get_jira_client
     options = {
-           :username => EVN['USER_NAME'],
-           :password => EVN['PASSWORD'],
-           :site     => EVN['SITE'],
+           :username => ENV['USERNAME'],
+           :password => ENV['PASSWORD'],
+           :site     => ENV['SITE'],
            :context_path => '',
            :auth_type => :basic
        }
