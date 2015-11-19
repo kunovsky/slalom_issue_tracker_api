@@ -22,5 +22,16 @@ module SlalomIssueTrackerApi
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    #Changing CORS policy for Development
+    config.middleware.use Rack::Cors do
+      allow do
+        origins 'http://localhost:8080'
+        resource '*',
+          :headers => :any,
+          :expose  => ['access-token', 'expiry', 'token-type', 'uid', 'client'],
+          :methods => [:get, :post, :options, :delete, :put]
+      end
+    end
   end
 end
