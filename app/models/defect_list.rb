@@ -3,16 +3,16 @@ class DefectList < ActiveRecord::Base
   BUG = "Bug"
 
   def self.create_defect_information(projects)
-    data = {}
-    projects.each_with_index do |project, idx|
-      data[idx] = {}
-      data[idx][:name] = project.name
-      data[idx][:issues] = []
-      data[idx][:issues_count] = 0
+    data = []
+    projects.each do |project|
+      project_info = {}
+      project_info[:name] = project.name
+      project_info[:issues] = []
+      project_info[:issues_count] = 0
       project.issues.each do |issue|
         if issue.fields['issuetype']['name'] == BUG
-          data[idx][:issues_count] +=1
-          data[idx][:issues].push({
+          project_info[:issues_count] +=1
+          project_info[:issues].push({
             summary: issue.summary,
             priority: issue.fields['priority']['name'],
             timespent: issue.fields['timespent'],
@@ -21,8 +21,8 @@ class DefectList < ActiveRecord::Base
           })
         end
       end
+      data.push(project_info)
     end
-    return { projects: [data] }
+    return { projects: data }
   end
-  
 end
