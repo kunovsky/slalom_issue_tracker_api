@@ -13,27 +13,27 @@ class DefectList < ActiveRecord::Base
       project_info[:graph_data][:day] = {}
       project_info[:priority_data] = {}
 
-      # TODO: Remove this
-      if project.name == "test_project"
-         project_info[:graph_data][:day][Date.parse('2015-11-17')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-11-16')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-11-15')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-11-14')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-10-14')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-9-15')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-9-17')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-8-17')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-11-13')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-11-12')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-10-17')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-10-16')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-10-15')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-10-15')] = 2
-         project_info[:graph_data][:day][Date.parse('2015-7-15')] = 2
-         project_info[:priority_data]["Highest"] = 8
-         project_info[:priority_data]["Medium"] = 10
-         project_info[:priority_data]["Lowest"] = 10
-      end
+      # # TODO: Remove this
+      # if project.name == "test_project"
+      #    project_info[:graph_data][:day][Date.parse('2015-11-17')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-11-16')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-11-15')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-11-14')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-10-14')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-9-15')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-9-17')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-8-17')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-11-13')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-11-12')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-10-17')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-10-16')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-10-15')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-10-15')] = 2
+      #    project_info[:graph_data][:day][Date.parse('2015-7-15')] = 2
+      #    project_info[:priority_data]["Highest"] = 8
+      #    project_info[:priority_data]["Medium"] = 10
+      #    project_info[:priority_data]["Lowest"] = 10
+      # end
 
       project.issues.each do |issue|
         if issue.fields['issuetype']['name'] == BUG
