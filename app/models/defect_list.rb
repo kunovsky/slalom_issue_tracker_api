@@ -105,10 +105,10 @@ class DefectList < ActiveRecord::Base
   def self.transform_hash_to_array_of_hashes(to_transform, key)
     storage = []
     to_transform.to_a.each do |data|
-      tmp = {}
-      tmp[:name] = data[0]
-      tmp[key] = data[1]
-      storage.push(tmp)
+      storage.push({
+        name: data[0],
+        "#{key}": data[1]
+        })
     end
     return storage
   end
