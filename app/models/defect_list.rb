@@ -99,6 +99,7 @@ class DefectList < ActiveRecord::Base
       end
       project_info[:priority_graph_data] = storage.flatten
     end
+    DefectList.create(data: {projects: data})
     return {projects: data}
   end
 
