@@ -28,7 +28,7 @@ class DefectList < ActiveRecord::Base
           priority  = issue.fields['priority']['name']
           email     = (issue.fields['assignee'] || {})['emailAddress']
           timespent = issue.fields['timespent']
-          cost      = self.calculate_cost(slalom_resources[email], timespent)
+          # cost      = self.calculate_cost(slalom_resources[email], timespent)
 
           project_info[:graph_data][:days][date] = 0 unless project_info[:graph_data][:days][date]
           project_info[:graph_data][:days][date] += 1
@@ -59,8 +59,7 @@ class DefectList < ActiveRecord::Base
             timespent: timespent,
             assignee: email,
             estimate: issue.fields['timeoriginalestimate'],
-            date: date,
-            cost: cost
+            date: date
           })
         end
       end
