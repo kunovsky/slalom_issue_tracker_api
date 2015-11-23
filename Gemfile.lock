@@ -68,6 +68,7 @@ GEM
       activesupport
       oauth (~> 0.4.7)
     json (1.8.3)
+    le (2.6.2)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
@@ -155,6 +156,7 @@ DEPENDENCIES
   has_heartbeat
   jbuilder (~> 2.0)
   jira-ruby
+  le
   pg (= 0.18.2)
   rack-cors
   rails (= 4.2.3)

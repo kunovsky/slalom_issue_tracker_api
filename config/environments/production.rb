@@ -53,6 +53,8 @@ Rails.application.configure do
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  
+  config.logger = Le.new('080fa16f-9e70-365b-951e-de62f4d1ccfb', :debug => true, :local => true)
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
