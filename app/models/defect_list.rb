@@ -3,12 +3,18 @@ class DefectList < ActiveRecord::Base
   BUG = "Bug"
 
   def self.create_defect_information(projects)
+    slalom_resources = SlalomResource.all.pluck(:email, :hourly_rate).to_h
     data = []
+
     projects.each do |project|
       project_info = {}
       project_info[:name] = project.name
       project_info[:defects] = []
+      project_info[:needs_resource_information] = []
       project_info[:defects_count] = 0
+      project_info[:defects_outstanding_count] = 0
+      project_info[:defects_fixed_count] = 0
+      project_info[:defects_fixed_cost] = 0
       project_info[:graph_data] = {}
       project_info[:graph_data][:days] = {}
       project_info[:priority_data] = {}
@@ -18,8 +24,11 @@ class DefectList < ActiveRecord::Base
         if issue.fields['issuetype']['name'] == BUG
           project_info[:defects_count] +=1
 
-          date = Date.parse(issue.fields['created'])
-          priority = issue.fields['priority']['name']
+          date      = Date.parse(issue.fields['created'])
+          priority  = issue.fields['priority']['name']
+          email     = (issue.fields['assignee'] || {})['emailAddress']
+          timespent = issue.fields['timespent']
+          cost      = self.calculate_cost(slalom_resources[email], timespent)
 
           project_info[:graph_data][:days][date] = 0 unless project_info[:graph_data][:days][date]
           project_info[:graph_data][:days][date] += 1
@@ -36,13 +45,22 @@ class DefectList < ActiveRecord::Base
             project_info[:priority_graph_data][priority][:days][date]
           project_info[:priority_graph_data][priority][:days][date] += 1
 
+          if !slalom_resources[email] &&
+            !project_info[:needs_resource_information].include?(email)
+            project_info[:needs_resource_information].push(email) if email
+          end
+
+          cost ? project_info[:defects_fixed_count] +=1 : project_info[:defects_outstanding_count] +=1 
+          project_info[:defects_fixed_cost] +=cost if cost
+
           project_info[:defects].push({
             summary: issue.summary,
             priority: issue.fields['priority']['name'],
-            timespent: issue.fields['timespent'],
-            assignee: (issue.fields['assignee'] || {})['emailAddress'],
+            timespent: timespent,
+            assignee: email,
             estimate: issue.fields['timeoriginalestimate'],
-            date: date
+            date: date,
+            cost: cost
           })
         end
       end
@@ -56,6 +74,13 @@ class DefectList < ActiveRecord::Base
       data.push(project_info)
     end
     return self.aggregate_week_and_month_data(data)
+  end
+
+  def self.calculate_cost(hourly_rate, timespent)
+    if hourly_rate && timespent
+      hours = ((timespent / 60) / 60)
+      return hourly_rate * hours
+    end
   end
 
   def self.populate_days_with_no_data(existing_days)
@@ -146,12 +171,12 @@ class DefectList < ActiveRecord::Base
     months = {}
     weeks.each do |date, count|
       if !current_month
-        current_month = date.month
+        current_month = date.strftime("%b, %Y")
         months[current_month] = count
-      elsif current_month == date.month
+      elsif current_month == date.strftime("%b, %Y")
         months[current_month] += count
       else
-        current_month = date.month
+        current_month = date.strftime("%b, %Y")
         months[current_month] = count
       end
     end
