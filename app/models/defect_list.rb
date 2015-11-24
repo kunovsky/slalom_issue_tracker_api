@@ -3,14 +3,20 @@ class DefectList < ActiveRecord::Base
   BUG = "Bug"
 
   def self.create_defect_information(projects)
-    slalom_resources = SlalomResource.all.pluck(:email, :hourly_rate).to_h
+    resources = SlalomResource.all
+
+    slalom_resources = resources.pluck(:email, :hourly_rate).to_h
+    resource_name = resources.pluck(:email, :name).to_h
+
     data = []
+    today = Date.today
 
     projects.each do |project|
       project_info = {}
+      defect_resources = {}
       project_info[:name] = project.name
-      project_info[:defects] = []
       project_info[:needs_resource_information] = []
+      project_info[:defects] = []
       project_info[:defects_count] = 0
       project_info[:defects_outstanding_count] = 0
       project_info[:defects_fixed_count] = 0
@@ -25,6 +31,8 @@ class DefectList < ActiveRecord::Base
           project_info[:defects_count] +=1
 
           date      = Date.parse(issue.fields['created'])
+          updated   = Date.parse(issue.fields['updated'])
+
           priority  = issue.fields['priority']['name']
           email     = (issue.fields['assignee'] || {})['emailAddress']
           timespent = issue.fields['timespent']
@@ -53,16 +61,26 @@ class DefectList < ActiveRecord::Base
           cost ? project_info[:defects_fixed_count] +=1 : project_info[:defects_outstanding_count] +=1 
           project_info[:defects_fixed_cost] +=cost if cost
 
-          project_info[:defects].push({
+          key = email ? email : :unassigned
+
+          defect_resources[key] = {email: key, defects: [], name: (resource_name[key] || key)} unless defect_resources[key]
+
+          defect_resources[key][:defects].push({
             summary: issue.summary,
             priority: issue.fields['priority']['name'],
             timespent: timespent,
-            assignee: email,
+            assignee: key,
             estimate: issue.fields['timeoriginalestimate'],
             date: date,
-            cost: cost
+            cost: cost,
+            updated: updated,
+            stale: updated < (Date.today - 30)
           })
         end
+      end
+
+      defect_resources.each do |resource|
+        project_info[:defects].push(resource[1])
       end
 
       project_info[:graph_data][:days] =
